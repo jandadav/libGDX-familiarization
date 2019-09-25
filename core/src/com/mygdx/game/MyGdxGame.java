@@ -29,8 +29,9 @@ public class MyGdxGame extends ApplicationAdapter {
 	public CameraInputController camController;
 	public ModelBatch modelBatch;
     public Model model;
-    public Model grid;
+	public Model grid;
 	public ModelInstance instance;
+	public ModelInstance camTarget;
 	public List<ModelInstance> instanceList = new ArrayList<>();
     public ModelInstance gridInstance;
 
@@ -43,19 +44,19 @@ public class MyGdxGame extends ApplicationAdapter {
 		modelBatch = new ModelBatch();
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(10f, 10f, 10f);
+		cam.position.set(10f, 10f, 7f);
 		cam.lookAt(0,0,0);
-		cam.near = 1f;
+		cam.near = 0.1f;
 		cam.far = 300f;
 		cam.update();
 		
         ModelBuilder modelBuilder = new ModelBuilder();
 		
-		model = modelBuilder.createBox(5f, 5f, 5f, 
-            new Material(ColorAttribute.createDiffuse(Color.GRAY)),
-            Usage.Position | Usage.Normal);
-        instance = new WireframeInstance(model);
-		instanceList.add(instance);
+		model = modelBuilder.createBox(1f, 1f, 1f, 
+            new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
+			Usage.Position | Usage.Normal);
+        camTarget = new WireframeInstance(model);
+		instanceList.add(camTarget);
 
 		modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("line", 1, 3, new Material());
@@ -77,11 +78,15 @@ public class MyGdxGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 		camController.update();
+
+		camTarget.transform.setToTranslation(camController.target);
+		
+		
 		
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
  
-        modelBatch.begin(cam);
+		modelBatch.begin(cam);
         modelBatch.render(instanceList, environment);
         modelBatch.end();
 	}
